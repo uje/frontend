@@ -1,0 +1,227 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=0">
+    <title>个人简历</title>
+    <style type="text/css">
+         html, body, div, span, header, section, h1, h2, h3, h4, p { margin: 0; padding: 0; box-sizing: border-box; }
+         a { text-decoration: none; }
+         a:link, a:visited, a:hover, a:active { color: #3675b4; }
+
+
+        .c-loading { position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: #fff; text-align: center; }
+        .c-loading .c-content { display: block; position: absolute; top: 30%; left: 50%;  margin: 0 0 0 -100px; width: 200px; line-height: 60px; border: 1px solid #ccc; border-radius: 5px; box-shadow: 2px 2px 6px #ccc; }
+
+        .c-h1 { padding-bottom: 40px; font-size: 30px; }
+        .c-h2 { padding: 20px 0; font-size: 20px; color: #3675b4; }
+        .c-h3 { font-size: 14px; }
+        .c-h4 { font-size: 12px; font-weight: normal; }
+        .c-title { padding-left: 120px }
+        .c-line { line-height: 25px; }
+        .c-label { display: inline-block; width: 100px; padding-right: 20px; white-space: nowrap; text-align: right; color: #aaa; font-family: "georgia"; }
+        .c-case { position: relative; margin-bottom: 30px; }
+        .c-left { position: absolute; width: 100px; }
+        .c-left .c-label { width: 100%; }
+        .c-left .c-label:nth-child(2n):before { display: inline-block; content: " ~ "; position: absolute; margin-left: -10px; }
+        .c-right, .c-text { margin-left: 120px; }
+        .c-detail { margin-top: 10px; }
+
+        body { background-color: #ddd; line-height: 1.6; font-size: 14px; }
+        .p-wrapper { min-height: 100%; background-color: #fff; padding: 10px; }
+        .p-header .c-label { position: absolute; }
+        .m-evaluate .c-h2 { padding-bottom: 10px; }
+        
+        .h-name-line { margin-bottom: 10px; font-size: 18px; }
+
+        @media screen and (min-width: 900px){
+            .c-label, .c-left { width: 140px; }
+            .c-title { padding-left: 160px; }
+            .c-right, .c-text { margin-left: 160px; }
+            .p-wrapper { width: 900px; margin: 0 auto 20px; padding: 60px; border: 1px solid #ccc; border-top: 2px solid #3675b4; }
+        }
+
+        @media screen and (max-width: 899px){
+            .c-left .c-label { font-size: 12px; }
+        }
+
+    </style>
+    <script type="text/javascript" src="../libs/vue/vue.min.js"></script>
+    <script type="text/javascript" src="../libs/vue/vue-resource.min.js"></script>
+</hea8>
+<body>
+    <div class="p-wrapper" id="app">
+        <div class="c-loading" v-show="loading">
+            <span class="c-content">请稍候，正在加载...</span>
+        </div>
+        <header class="p-header">
+            <h1 class="c-title c-h1">个人简历</h1>
+            <div class="h-base">
+                <div class="c-line h-name-line">
+                    <label class="c-label"></label>
+                    <span class="c-text">{{baseInfo.name}}（{{baseInfo.sex}}，{{baseInfo.age}}岁）</span>
+                </div>
+                <div class="c-line">
+                    <label class="c-label">联系电话</label>
+                    <span class="c-text">{{baseInfo.mobile}}</span>
+                </div>
+                <div class="c-line">
+                    <label class="c-label">E-mail</label>
+                    <span class="c-text">{{baseInfo.email}}</span>
+                </div>
+                <div class="c-line">
+                    <label class="c-label">就职公司</label>
+                    <span class="c-text">{{currentWork.title}} - {{currentWork.company}}</span>
+                </div>
+                <div class="c-line">
+                    <label class="c-label">学历</label>
+                    <span class="c-text">{{currentEducation.type}} - {{currentEducation.major}} - {{currentEducation.school}}</span>
+                </div>
+            </div>
+        </header>
+        <div class="p-main">
+
+            <!-- 工作经历 -->
+            <section class="m-work">
+                <h2 class="c-title c-h2">工作经历</h2>
+                <section class="c-case" v-for="w in works">
+                    <div class="c-left">
+                        <label class="c-label">{{w.beginDate|formatDate}}</label>
+                        <label class="c-label">{{w.endDate|formatDate}}</label>
+                    </div>
+                    <div class="c-right">
+                        <h3 class="c-h3">{{w.company}}</h3>
+                        <span>担任职位：{{w.title}}</span>
+                        <p class="c-detail">{{{w.job|formatText}}}</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- 项目经验 -->
+            <section class="m-project">
+                <h2 class="c-title c-h2">项目经验</h2>
+                <section class="c-case" v-for="p in projects">
+                    <div class="c-left">
+                        <label class="c-label">{{p.beginDate|formatDate}}</label>
+                        <label class="c-label">{{p.endDate|formatDate}}</label>
+                    </div>
+                    <div class="c-right">
+                        <h3 class="c-h3">{{p.name}}</h3>
+                        <span>{{p.job}}</span>
+                        <p class="c-detail">{{{p.detail|formatText}}}</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- 自我评价 -->
+            <section class="m-evaluate">
+                <h2 class="c-title c-h2">自我评价</h2>
+                <div class="c-right">
+                    <p>{{baseInfo.evaluate}}</p>
+                </div>
+            </section>
+        </div>
+    </div>
+    <script type="text/javascript">
+        (function(Vue){
+
+            var _extend = (function() {
+                var toString = Object.prototype.toString,
+                    slice = [].slice,
+                    isType = function(type, input){
+
+                        if(input)
+                            return toString.call(input).slice(8, -1).toLowerCase() === type;
+                        else
+                            return function(input){
+                                return isType(type, input);
+                            };
+                    },
+                    isObject = isType('object');
+
+                return function(obj1, obj2){
+
+                    if(arguments.length === 2){
+                        for(var key in obj2){
+                            var newValue = obj2[key];
+
+                            if(newValue != null){
+                                if(isObject(newValue)){
+
+                                    if(!obj1.hasOwnProperty(key))
+                                        obj1[key] = {};
+
+                                    _extend(obj1[key], newValue);
+                                }
+                                else{
+                                    obj1[key] = newValue;
+                                }
+                            }
+                        }
+                    }else if(arguments.length > 2){
+                        var objList = slice.call(arguments, 1);
+
+                        for(var i=0, l=objList.length; i<l; i++){
+                            _extend(obj1, objList[i]);
+                        }
+                    }
+
+                    return obj1;
+                };
+            })();
+
+            Vue.filter('formatDate', function(date) {
+                if(!date)
+                    return '至今';
+                else{
+                    var _date = new Date(date);
+                    return [_date.getFullYear(), '年', _date.getMonth()+1, '月', _date.getDate(), '日'].join('');
+                }
+            });
+
+            Vue.filter('formatText', function(text){
+                return text.replace(/\n/g, '<br/>');
+            });
+            
+            var app = new Vue({
+                el   : '#app',
+                data : {
+                    loading: true,
+                    baseInfo: {
+                        name : null,
+                        sex  : null,
+                        age  : null,
+                        city : null,
+                        mobile: null,
+                        email: null,
+                        evaluate: null,
+                        experience: null
+                    },
+                    currentWork: {
+                        title: null,
+                        company: null
+                    },
+                    currentEducation : {
+                        school: null,
+                        major: null,
+                        beginDate: null,
+                        endDate: null,
+                        type: null
+                    },
+                    works: null,
+                    projects: null
+                },
+                created: function(){
+                    this.$http.get('data/resume.json').then(function(response){
+                        _extend(app, response.data);
+
+                        app.currentWork = response.data.works[0];
+                        app.currentEducation = response.data.educations[0];
+                        app.loading = false;                    
+                    });
+                }
+            });
+        })(Vue);
+    </script>
+</body>
+</html>

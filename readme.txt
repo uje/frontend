@@ -1,0 +1,1 @@
+Chrome不支持本地ajax, 需要安装NodeJS, 然后运行 node server.js, 然后在浏览器中输入 http://localhost:8000

@@ -1,0 +1,139 @@
+
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+	<title>vueJS示例</title>
+	<link rel="stylesheet" href="css/main.css">
+	<link rel="stylesheet" href="css/weui.css">
+	<style>
+		.empty-data { display: block; padding: 60px 0; text-align: center; color: #ccc; }
+		.list-loading { display: block; text-align: center; }
+		.banner img { width: 100%; }
+        .main { padding-bottom: 55px; }
+        .list-item { position: relative; border: 1px solid #e1ddc6 !important; background: #f7f5e8; border-radius: 5px; margin: 10px; padding-right: 30px; cursor: pointer; }
+            .list-item :after { content: ">>"; display: block; position: absolute; top: 50%; right: 10px; transform: translateY(-50%); -webkit-transform: translateY(-50%); -moz-transform: translateY(-50%); }
+            .list-item h2, .list-item p { font-weight: normal; font-size: 14px; }
+            .list-item h2 { margin-right: 20px; }
+            .list-item .city { display: inline-block; margin-right: 20px; }
+	</style>
+	<script src="../libs/vue/vue.min.js"></script>
+	<script src="../libs/vue/vue-resource.min.js"></script>
+</head>
+<body id="app">
+	<div class="wrapper">
+		<header class="header">
+			<h1>职位列表</h1>
+		</header>
+		<div class="banner">
+			<img src="images/NLIReadingRoom_ZH-CN13259592233_1920x1080.jpg" />
+		</div>
+		<section class="main">
+			<div class="weui_search_bar" id="search_bar" >
+				<form class="weui_search_outer"  v-on:submit.prevent="initSearch">
+					<div class="weui_search_inner"> <i class="weui_icon_search"></i>
+						<input type="search" class="weui_search_input" id="search_input" placeholder="输入职位名称/城市进行搜索" v-model="search" />
+					</div>
+				</form>
+			</div>
+			<div class="list" id="list">
+				<div class="list-item" v-for="item in jpData" v-if="!!jpData">
+					<h2 class="title">{{item.JPName}}</h2>
+					<p class="detail">
+						<span class="city">{{item.JPArea}}</span>
+						<span class="jifen">奖励积分：{{item.JPShareScore}}</span>
+					</p>
+				</div>
+				<span class="list-loading" v-if="hasMore">请稍候，正在加载.</span>
+				<span class="empty-data" v-if="!jpData">没有数据.</span>
+			</div>
+		</section>
+
+		<footer class="footer fixed box">
+			<a href="javascript:;" class="btn btn-cs1">悬赏任务</a>
+			<a href="javascript:;" class="btn btn-cs1">推荐明细</a>
+		</footer>
+	</div>
+	<script>
+		 (function () {
+
+            new Vue({
+                el: '#app',
+                data: {
+                    offset: 0,
+                    limit: 10,
+                    url: 'data/data.json',
+                    hasMore: true,
+                    isLoading: false,
+                    jpData: [],
+                    search: ''
+                },
+                methods: {
+                    fetch: function () {
+                        var me = this;
+                        var url = [me.url, '?offset=', me.offset, '&limit=', me.limit, '&search=', me.search, '&rnd=', Math.random().toString()].join('');
+
+                        if (me.isLoading || !me.hasMore)
+                            return;
+
+                        console.log('加载数据：', url);
+                        this.$http.get(url).then(function (response) {
+
+                            var data = response.data;
+
+                            if (data)
+                                me.jpData = me.jpData.concat(data.list);
+
+                            me.hasMore = data.hasMore;
+                            me.isLoading = false;
+
+                            if (me.hasMore)
+                                me.offset += me.limit;
+                        })
+                    },
+                    checkPoint: function () {
+
+                        var scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop),
+                            scrollHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight),
+                            mustLoadData = (scrollTop + screen.height + 3 > scrollHeight);
+
+                        if (mustLoadData)
+                            this.fetch();
+                    },
+                    initSearch: function () {
+                        console.log('begin searching');
+                        this.offset = 0;
+                        this.jpData = [];
+                        this.hasMore = true;
+                        this.fetch();
+                    },
+                    showDetail: function (item) {
+                        alert(item.id);
+                    }
+                },
+                created: function () {
+                    var me = this,
+                        timeoutId = null;;
+
+                    this.inited = true;
+                    this.fetch();
+
+                    window.onscroll = function () {
+
+                        if (me.isLoading || !me.hasMore)
+                            return;
+
+                        if (timeoutId != null)
+                            clearTimeout(timeoutId);
+
+                        timeoutId = setTimeout(function () {
+                            me.checkPoint.apply(me, arguments);
+                        }, 500);
+                    }
+                }
+            });
+        })();
+	</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" />
+		<title>测试</title>
+		<style>
+			.container { padding-top: 200px; text-align: center; }
+			.console { color: #f00; font-size: 12px; }
+			.file-group { display: inline-block; position: relative; overflow: hidden; }
+		    .file-group.inline { display: inline-block; }
+		    .file-group .file-btn { display: block; padding: 0 20px; line-height: 50px; background-color: #3675b4; color: #fff; border-radius: 5px; }
+		    .file-group input[type="file"] { position: absolute; left: 0; top: 0; font-size: 50px; opacity: 0; cursor: pointer; }
+		    .file-group img { display: block; margin-top: 10px; max-height: 100px; max-width: 100%; }
+		    .file-group .delete { background: none; border-width: 0; font-size: 14px; color: #459ae9; }
+		    .file-group iframe { display: none; }
+		</style>
+	</head>
+	<body>
+	
+		<div class="container">
+			<div id="fileUploader"></div>
+			<div id="console" class="console"></div>
+		</div>
+
+    	<!-- 使用模块化开发，如不需要请把tabs.js里的define去掉 -->
+    	<script src="../libs/sea.min.js"></script>
+    	<script>
+    		seajs.use('./js/fileUploader', function(FileUploader){
+    			var writeLog = (function($console){
+    				var lineNo = 0;
+    				return function(msg){
+    					$console.append(['<p>', lineNo, ':', msg, '</p>'].join(''));
+    					lineNo++;
+    				}
+    			})($('#console'));
+
+				new FileUploader({
+					el: '#fileUploader',
+		            url: 'data/uploader.json',
+		            data: {
+		            	fileName: '测试',
+		            	fileType: 'any'
+		            },
+		            onCreated: function() {
+		            	writeLog('创建控件');
+		            },
+		            always: function(){
+		            	writeLog('发送文件后回调，这个事件总是运行');
+		            },
+		            uploadError: function (r) {
+						writeLog('上传出错！');
+		            },
+		            uploadComplete: function (r) {
+		                writeLog('上传完成！');
+		            }
+		        });
+			});
+    	</script>
+	</body>
+</html>

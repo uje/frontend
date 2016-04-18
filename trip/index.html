@@ -1,0 +1,304 @@
+<!doctype html>
+<html id="app">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+        <title>{{name}} - 行程单</title>
+        <style>
+            html, body, div, span, header, section, h1, h2, h3, h4, p { margin: 0; padding: 0; box-sizing: border-box; }
+            a { text-decoration: none; }
+            a:link, a:visited, a:hover, a:active { color: #3675b4; }
+            body { line-height: 1.6; }
+            .c-label-before { position: relative; display: inline-block; padding-left: 45px; margin-right: 20px; }
+            .c-label-before:before { position: absolute; left: 0; top: 0; display: block; color: #ccc; }
+
+
+            .c-loading { z-index: 9999; position: fixed; top: 0; right: 0; bottom: 0; left: 0; background: #fff; text-align: center; }
+            .c-loading .c-content { display: block; position: absolute; top: 30%; left: 50%;  margin: 0 0 0 -100px; width: 200px; line-height: 60px; border: 1px solid #ccc; border-radius: 5px; box-shadow: 2px 2px 6px #ccc; }
+
+
+            .wrapper { max-width: 480px; margin: 0 auto; padding: 20px 10px 10px; border-left: 1px solid #ccc; border-right: 1px solid #ccc; }
+
+            .p-header { text-align: center; }
+            .h-title { margin-bottom: 5px; font-weight: normal; font-size: 26px; }
+            .h-total-time:before { content: "用时："; }
+            .h-total-money { color: #f00; }
+            .h-total-money:before { content: "花费："; }
+
+            .p-main { margin-top: 30px; }
+
+            .m-case { margin-bottom: 30px; }
+            .m-case .m-card:last-child { border-bottom: none; }
+            .m-title { margin-bottom: 20px; padding: 0 30px; background-color: #3675b4; color: #fff; line-height: 36px; font-size: 16px; border-radius: 5px; font-family: "georgia"; }
+            .m-card { position: relative; margin: 10px 30px; padding: 10px; border-bottom: 1px dashed #ddd; }
+            .mc-time { position: absolute; width: 60px; font-family: "georgia"; }
+            .mc-end { position: relative; }
+            .mc-end:before { position: absolute; left: -10px; display: block; content: "~"; }
+            .mc-detail { margin-left: 60px; }
+            .mc-desc { font-weight: normal; }
+            .mc-money, .m-weather { font-weight: normal; }
+            .mc-money {  color: #f00; }
+            .mc-money:before { content: "费用："; }
+            .m-weather { float: right; margin-right: 0; font-size: 12px; color: #fff; }
+            .m-weather:before { content: "天气："; }
+            .m-fixed { padding-top: 56px; }
+            .m-fixed .m-title { position: fixed; z-index: 2; top: 0; }
+        </style>
+    </head>
+    <body>
+        <div class="c-loading" v-if="loading">
+            <span class="c-content">请稍候，正在加载...</span>
+        </div>
+        <div class="wrapper">
+            <header class="p-header">
+                <h1 class="h-title">{{name}} - 行程单</h1>
+                <p class="h-desc">
+                    <span class="c-label-before h-total-time">{{totalTime}}</span>
+                    <span class="c-label-before h-total-money">￥{{totalMoney}}</span>
+                </p>
+            </header>
+            <div class="p-main">
+                <section class="m-case" v-for="(i, t) in timeline" v-scroll-fixed.literal="h2">
+                    <h2 class="m-title">
+                        {{beginDate|formatDate i}}
+                        <span class="c-label-before m-weather">{{t.weather}}</span>
+                    </h2>
+                    <div class="m-card" v-for="r in t.trip">
+                        <div class="mc-time">
+                            <span class="mc-begin">{{r.beginTime}}</span>
+                            <span class="mc-end">{{r.endTime}}</span>
+                        </div>
+                        <div class="mc-detail">
+                            <p class="mc-other">
+                                <span class="c-label-before mc-money">{{r.money|formatMoney}}</span>
+                            </p>
+                            <strong class="mc-desc">{{{r.desc|formatDesc}}}</strong>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+        <script src="../libs/vue/vue.min.js"></script>
+        <script src="../libs/vue/vue-resource.min.js"></script>
+        <script>
+            (function(Vue) {
+                var _extend = (function() {
+                var toString = Object.prototype.toString,
+                    slice = [].slice,
+                    isType = function(type, input){
+
+                        if(input)
+                            return toString.call(input).slice(8, -1).toLowerCase() === type;
+                        else
+                            return function(input){
+                                return isType(type, input);
+                            };
+                    },
+                    isObject = isType('object');
+
+                    return function(obj1, obj2){
+
+                        if(arguments.length === 2){
+                            for(var key in obj2){
+                                var newValue = obj2[key];
+
+                                if(newValue != null){
+                                    if(isObject(newValue)){
+
+                                        if(!obj1.hasOwnProperty(key))
+                                            obj1[key] = {};
+
+                                        _extend(obj1[key], newValue);
+                                    }
+                                    else{
+                                        obj1[key] = newValue;
+                                    }
+                                }
+                            }
+                        }else if(arguments.length > 2){
+                            var objList = slice.call(arguments, 1);
+
+                            for(var i=0, l=objList.length; i<l; i++){
+                                _extend(obj1, objList[i]);
+                            }
+                        }
+
+                        return obj1;
+                    };
+                })();
+
+                Vue.filter('formatDate', function(input, i){
+                    var dateArr = input.split('-'),
+                        date = new Date(parseInt(dateArr[0]), parseInt(dateArr[1], 10)-1, parseInt(dateArr[2]));
+                        date.setDate(date.getDate() + i);
+
+                    return [date.getFullYear(), date.getMonth()+1, date.getDate()].join('-');
+                });
+
+                Vue.filter('formatMoney', function(input){
+                    return (input === 0 ? '无需费用' : ['￥', input].join(''));
+                });
+
+                Vue.filter('formatDesc', function(input){
+                    return input.replace(/\r\n/g, '<br/><br/>');
+                });
+
+                var fe = (function(window, document, undefined){
+                    var cache = (function(data){
+                            function get(key, initGetValue, noExecute){
+                                var value = data[key];
+
+                                if(value == null){
+                                    value = noExecute ? initGetValue : initGetValue();
+                                    data[key] = value;
+                                }
+
+                                return value;
+                            }
+
+                            function remove(key){
+                                delete data[key];
+                            }
+
+                            function removeByPrefix(prefix){
+                                for(var key in data){
+                                    if(key.indexOf(prefix) === 0)
+                                        delete data[key];
+                                }
+                            }
+
+                            return { get: get, remove: remove, removeByPrefix: removeByPrefix };
+                        })({});
+
+                    function getOffset(element){
+                        return cache.get(makeKey(element, 'offset'), function(){
+
+                            if('getBoundingClientRect' in element)
+                                return element.getBoundingClientRect();
+                            
+                            var offsetParent = element.offsetParent,
+                                offset = { left: element.offsetLeft, top: element.offsetTop },
+                                parentOffset;
+
+                            if(offsetParent){
+                                parentOffset = getOffset(offsetParent);
+                                offset.left += parentOffset.left;
+                                offset.top += parentOffset.top;
+                            }
+
+                            return offset;
+                        });
+                    }
+
+                    function makeKey(element){
+                        var elementId = element.getAttribute('data-cache-id');
+
+                        if(elementId == null){
+                            elementId = ['element', Math.random().toString().slice(2)].join('-');
+                            element.setAttribute('data-cache-id', elementId);
+                        }
+
+                        return arguments.length === 1 ? elementId : [elementId].concat([].slice.call(arguments, 1)).join('-');
+                    }
+
+                    function getHeight(element){
+                        return cache.get(makeKey(element, 'Height'), function(){
+                            return element.offsetHeight;
+                        });
+                    }
+
+                    function makeFixedTitleFn(element, selector){
+                        return cache.get(makeKey(element, 'fixedTitleFn'), function(event){
+                            this.requestAnimationFrame(function(){
+                                var elmFixedBar = element.querySelector(selector);
+
+                                if(isNaN(parseInt(elmFixedBar.style['width'], 10))){
+                                    elmFixedBar.style.width = elmFixedBar.offsetWidth + 'px';
+                                }
+
+                                var offsetTop = fe.getOffset(element).top,
+                                    scrollTop = document.body.scrollTop;
+
+                                if(scrollTop > offsetTop - 10 && scrollTop < offsetTop + element.offsetHeight)
+                                    element.classList.add('m-fixed');
+                                else
+                                    element.classList.remove('m-fixed');
+                            });
+                        }, true);
+                    }
+
+                    return { 
+                        getOffset: getOffset, 
+                        getHeight: getHeight,
+                        getCache: cache.get,
+                        removeCache: cache.remove,
+                        removeByPrefix: cache.removeByPrefix,
+                        makeFixedTitleFn: makeFixedTitleFn, 
+                        requestAnimationFrame: (function(){
+                            var requestAnimationFrame =  window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||  window.msRequestAnimationFrame || function(callback){
+                                callback();
+                            };
+
+                            return function(callback){
+                                requestAnimationFrame(callback);
+                            };
+                        })(),
+                        supporTouch: (function(){
+                            return 'ontouchstart' in document;
+                        })()
+                    };
+                })(window, document, undefined);
+
+                Vue.directive('scroll-fixed', {
+                    bind: function(){
+                        !fe.supportTouch && window.addEventListener('scroll', fe.makeFixedTitleFn(this.el, this.expression), false);
+                    },
+                    unbind: function(){
+
+                        if(!fe.supportTouch){
+                            window.removeEventListener('scroll', fe.makeFixedTitleFn(this.el, this.expression), false);
+                            fe.removeByPrefix(this.el);
+                        }
+                    }
+                });
+
+                new Vue({
+                    el   : '#app',
+                    data : {
+                        loading: true,
+                        name: null,
+                        totalTime: null, 
+                        totalMoney: 0,
+                        timeline: null
+                    }, 
+                    computed: {
+                        totalTime: function(){
+                            return this.timeline.length + '天';
+                        },
+                        totalMoney: function(){
+                            var totalMoney = 0;
+                            
+                            this.timeline.forEach(function(time){
+                                time.trip.forEach(function(trip){
+                                    totalMoney+=trip.money;
+                                });
+                            });
+
+                            return totalMoney;
+                        }
+                    },
+                    created: function(){
+                        var me = this;
+
+                        this.$http.get('data/chaoshan.json').then(function(response){
+                            _extend(me, response.data);
+
+                            me.loading = false;
+                        });
+                    }
+                });
+            })(Vue);
+
+        </script>
+    </body>
+</html>     

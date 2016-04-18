@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" />
+		<title>route示例</title>
+		<style>
+			html, body, div, h1, h2, p, ul, li { margin: 0; padding: 0; }
+			.panel { display: none; max-width: 360px; margin: 0 auto; padding: 20px 10px; }
+			a, a:link, a:visited, a:hover, a:active { text-decoration: none; }
+			a { color: #3675b4; }
+			li { list-style-type: none; }
+			h1, h2 { font-weight: normal; text-align: center; }
+
+			body { line-height: 2; }
+			.btn-container { margin: 20px auto;  text-align: center; }
+			.btn { display: inline-block; padding: 0 20px; line-height: 36px; text-align: center; background: linear-gradient(top, #4d90fe, #4787ed); background: -webkit-linear-gradient(top, #4d90fe, #4787ed); background: -moz-linear-gradient(top, #4d90fe, #4787ed); text-decoration: none; color: #fff; border-radius: 5px; }
+			.btn-container .btn { margin: 0 5px; }
+			.list-title { display: block; margin: 20px 0 5px; }
+			.slideRight { animation: slideRight 0.5s; -webkit-animation: slideRight 0.5s; -moz-animation: slideRight 0.5s; }
+			.slideLeft { animation: slideLeft 0.5s; -webkit-animation: slideLeft 0.5s; -moz-animation: slideLeft 0.5s; }
+
+			@keyframes slideRight {
+				from { transform: translateX(-100%); }
+				to  { transform: translateX(0); }
+			}
+
+			@-webkit-keyframes slideRight {
+				from { -webkit-transform: translateX(-100%); }
+				to  { -webkit-transform: translateX(0); }
+			}
+
+			@-moz-keyframes slideRight {
+				from { -moz-transform: translateX(-100%); }
+				to  { -moz-transform: translateX(0); }
+			}
+
+			@keyframes slideLeft {
+				from { transform: translateX(100%); }
+				to  { transform: translateX(0); }
+			}
+
+			@-webkit-keyframes slideLeft {
+				from { -webkit-transform: translateX(100%); }
+				to  { -webkit-transform: translateX(0); }
+			}
+
+			@-moz-keyframes slideLeft {
+				from { -moz-transform: translateX(100%); }
+				to  { -moz-transform: translateX(0); }
+			}
+
+			@media screen and (min-width: 480px) {
+				.panel { border: 10px solid #f5f5f5; border-radius: 5px; margin-top: 20px; }	
+			}
+		</style>
+	</head>
+	<body>
+		<div class="panel" data-panel-id="step1">
+			<h1>路由插件示例</h1>
+			<div>
+				<ul>
+					<li>
+						<strong class="list-title">这个插件有啥用？</strong>
+						<p>通过url中的锚点来控制函数执行。展开来说，当你做单页面的时候，可以通过不同的链接来控制不同的视图显示。</p>
+					</li>
+					<li>
+						<strong class="list-title">原理是什么？</strong>
+						<p>通过监听location.hash的hashChange事件来处理</p>
+					</li>
+					<li>
+						<p>请观察页面Url的变化。</p>
+					</li>
+				</ul>
+				
+				<div class="btn-container">
+					<a href="#step2" class="btn">路由方法</a>
+				</div>
+			</div>
+		</div>
+		<div class="panel" data-panel-id="step2">
+			<h2>路由方法</h2>
+			<div>
+				<ul>
+					<li>
+						<strong class="list-title">route.register(url, callback)</strong>
+						<p>注册一个路由，共有两个参数组成；</p>
+						<p>url 可为普通文本，可为正则，当为正则时会捕获()内的内容并放入calllback内当参数；</p>
+						<p>callback(url, arguments....) 回调函数，当访问匹配的url时触发，参数包含原始url及捕获的内容列表。</p>
+					</li>
+					<li>
+						<strong class="list-title">route.map({})</strong>
+						<p>批量注册路由。参数为对象；对象中当，key为url, 值为callback。</p>
+					</li>
+					<li>
+						<strong class="list-title">route.load(url)</strong>
+						<p>触发指定路由。</p>
+					</li>
+				</ul>
+				
+				<div class="btn-container">
+					<a href="#step1" class="btn">返回</a>
+					<a href="#step3" class="btn">带参数的路由</a>
+				</div>
+			</div>
+		</div>
+		<div class="panel" data-panel-id="step3">
+			<h2>带参数的路由</h2>
+			<div>
+				<p>下面是一个带参数的路由的链接，通过 route.register('end/(.+)', function(url, word){}) 来注册的，实际跳转的路由地址为 #end/haha，在回调中，会弹出一个提示框显示哈哈，效果请点击“查看效果”按钮。</p>
+				
+				<div class="btn-container">
+					<a href="#step2" class="btn">路由方法</a>
+					<a href="#end/haha" class="btn">查看效果</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel" data-panel-id="end">
+			<h2>带参数的路由</h2>
+			<div>
+				<p>当前传入的参数为：<strong id="paramRoute"></p>
+				<div class="btn-container">
+					<a href="#step3" class="btn">带参数的路由</a>
+				</div>
+			</div>
+		</div>
+
+
+		<script src="../libs/sea.min.js"></script>
+		<script>
+			seajs.use('./route', function(route) {
+
+				var panelList = [].slice.call(document.querySelectorAll('.panel'));
+
+				function showPanel(panelId){
+					panelList.forEach(function(panel){
+						if(panelId === panel.getAttribute('data-panel-id')){
+							currentPanel = panel;
+							panel.style.display = 'block';
+						}else{
+							panel.style.display = 'none';
+						}
+					});
+				}
+				
+				// 批量注册
+				route.maps({
+					'.*': function(){
+						location.hash = '#step1';
+					}
+					, 'end/(.+)': function(uri, word){
+						showPanel('end');
+						document.getElementById('paramRoute').innerHTML = word;
+					}
+				});
+
+				panelList.forEach(function(panel){
+					var currentPanelId = panel.getAttribute('data-panel-id');
+
+					// 注册
+					route.register(currentPanelId, function(){
+						showPanel(currentPanelId);
+					});
+				});
+			});
+		</script>
+	</body>
+</html>
