@@ -23,7 +23,8 @@ function AutoComplete(){
 AutoComplete.prototype = {
 	initialize: function(options){
 		utils.extend(this, new Event());
-		var options = this.options = utils.extend({}, AutoComplete.defaults, options);
+		var options = this.options = utils.extend({}, AutoComplete.defaults, options),
+			instance = this;
 
 		var input = this.input = document.querySelector(options.el);
 		input.autocomplete = 'off';
@@ -41,9 +42,41 @@ AutoComplete.prototype = {
 
 			if(input.value.trim() != '' && this.data != null && this.data.length > 0){
 				this.listContainer.style.display = 'block';
+				input.keyup();
 				event.stopPropagation();
 			}
 		}, this), false);
+
+		input.addEventListener('keydown', proxy(function(input, event){
+
+			// 列表没数据时不响应按钮
+			if(this.items == null || this.items.length < 1)
+				return;
+
+			switch(event.keyCode){
+				case 38:
+					if(this.focusIndex > 0){
+						this.focusIndex--;
+						this.itemFocus();
+					}
+				break;
+				case 40:
+					if(this.focusIndex < this.items.length - 1){
+						this.focusIndex++;
+						this.itemFocus();
+					}
+				break;
+				case 13:
+					this.items.forEach(function(item){
+						if(item.classList.contains(options.focusClass)){
+							instance.fromEnter = true;
+							item.click();
+						}
+					});
+				break;
+			}
+		}, this), false);
+
 		container.appendChild(input);
 
 		// 创建列表
@@ -76,7 +109,7 @@ AutoComplete.prototype = {
 	keyupHandler: function(input, event){
 		var instance = this,
 			options  = this.options,
-			value    = input.value,
+			value    = input.value.trim(),
 			url ;
 
 		if(this.timerID) 
@@ -88,6 +121,19 @@ AutoComplete.prototype = {
 			return;
 		}
 
+		// 清掉回车过来的状态
+		if(this.fromEnter){
+			this.fromEnter = false;
+			return;
+		}
+
+		// 当前值跟上次一样
+		if(this.lastValue === value)
+			return;
+
+		// 保存当前值，防止同样的值重新搜索
+		this.lastValue = value;
+
 		// 如果是本地数据直接用函数过滤
 		if(utils.isArray(options.data)){
 			var filterData = this.filterData = options.filter(this.data, value);
@@ -95,6 +141,7 @@ AutoComplete.prototype = {
 			return;
 		}
 
+		
 		url = options.data.replace('{0}', value);
 
 		// 使用定时器来减少服务器压力
@@ -129,25 +176,29 @@ AutoComplete.prototype = {
 		}
 
 		// 找到数据并转换数据
-		var selectedData = (this.filterData || this.data)[selectedItem.getAttribute('data-index')],
+		var selectedIndex = this.focusIndex = selectedItem.getAttribute('data-index'),
+			selectedData = (this.filterData || this.data)[selectedIndex],
 			inputValue = options.formatSelectedData(selectedData); // 格式化选中的值
 
 		this.input.value = inputValue;
 		this.list.style.visibility = 'hidden';
 
 		// 去除之前选中节点的选中class，给现在选中的节点加class
-		slice.call(this.list.childNodes).forEach(function(item){
+		this.items.forEach(function(item){
 			item.classList.remove(options.selectedClass);
 		});
 
 		this.list.style.visibility = 'visible';
+		this.input.focus();
 		selectedItem.classList.add(options.selectedClass);
 		this.trigger('selected', selectedData);
 
 	},
 	render: function(data){
-		var options = this.options,
-			list    = this.list;
+		var instance = this,
+			options = this.options,
+			list    = this.list,
+			items;
 
 		if(data.length > 0){
 			var listItemsHtml = data.map(function(item){
@@ -157,15 +208,29 @@ AutoComplete.prototype = {
 			list.innerHTML = listItemsHtml;
 
 			// 给数据列表加标识，加样式
-			slice.call(list.childNodes).forEach(function(item, i){
+			items = this.items = slice.call(list.childNodes);
+			items.forEach(function(item, i){
 				item.className = [options.itemClass, (i % 2 === 0 ? options.oddClass : options.evenClass)].join(' ');
 				item.setAttribute('data-index', i);
+				instance.focusIndex = 0;
+				instance.itemFocus();
 			});
 		}else{
 			list.innerHTML = this.emptyTemplate;
 		}
 
 		this.listContainer.style.display = 'block';
+	},
+	itemFocus: function(){
+		var instance = this,
+			options = this.options;
+
+		this.items.forEach(function(item, index){
+			if(index === instance.focusIndex)
+				item.classList.add(options.focusClass);
+			else
+				item.classList.remove(options.focusClass);
+		})
 	}
 }
 
@@ -181,6 +246,7 @@ AutoComplete.defaults = {
 	oddClass       : 'ac-odd',
 	evenClass      : 'ac-even',
 	selectedClass  : 'ac-selected',
+	focusClass     : 'ac-focus',
 	buildList: function(){
 		return '<ul></ul>';
 	},
