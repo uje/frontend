@@ -38,7 +38,7 @@ AutoComplete.prototype = {
 
 		// 注册事件，有关键词有数据的时候显示控件
 		input.addEventListener('click', proxy(function(input, event){
-			
+
 			if(input.value.trim() != '' && this.data != null && this.data.length > 0){
 				this.listContainer.style.display = 'block';
 				event.stopPropagation();
@@ -123,8 +123,10 @@ AutoComplete.prototype = {
 			selectedItem = event.target.classList.contains(options.itemClass) ? event.target : event.target.parentNode;
 		
 		// 找到 有item标识的节点
-		if(!selectedItem.classList.contains(options.itemClass))
+		if(!selectedItem.classList.contains(options.itemClass)){
 			event.stopPropagation();
+			return;
+		}
 
 		// 找到数据并转换数据
 		var selectedData = (this.filterData || this.data)[selectedItem.getAttribute('data-index')],
