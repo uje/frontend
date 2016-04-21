@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>AutoComplete示例</title>
+        <style>
+            html, body, div, h1, ul, li, input, textarea,strong { margin: 0; padding: 0; box-sizing: content-box; }
+            a, a:link, a:visited, a:hover, a:active { text-decoration: none; color: #3675b4; }
+            li { list-style-type: none; }
+            .page-title { margin-bottom: 30px; font-size: 26px; }
+
+            .wrapper { max-width: 600px; margin: 0 auto; padding-top: 120px; }
+            .ac-container {position: relative; display: inline-block; }
+            .ac-input { display: block; width: 290px; padding: 0 5px; border: 3px solid #ddd; border-radius: 5px; line-height: 36px; }
+            .ac-list-container { z-index: 10; display: none; position: absolute; width: 300px; margin-top: 10px; background-color: #fff; border: 1px solid #eee; border-radius: 0 0 5px 5px; box-shadow: 3px 3px 3px #ccc; }
+            .ac-item a { display: block; padding: 0 40px 0 10px; line-height: 36px; text-align: left; }
+            .ac-item a:hover, .ac-selected { background-color: #ddd; }
+
+            .sub-title { display: block; margin-top: 30px; font-size: 20px; }
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            <h1 class="page-title">AutoComplete示例</h1>
+            <input type="text" id="keyword">
+
+            <strong class="sub-title">调用方式</strong>
+            <pre>
+new AutoComplete({
+    el             : '#keyword'                // 文本框（这里使用document.querySelector获取）
+    interval       : 500,                      // 触发ajax间隔
+    containerClass : 'ac-container',           // 外层容器className
+    inputClass     : 'ac-input',               // 输入框className
+    listContainerClass: 'ac-list-container',   // 列表容器ClassName
+    listClass      : 'ac-list',                // 列表className
+    itemClass      : 'ac-item',                // 数据条目className
+    oddClass       : 'ac-odd',
+    evenClass      : 'ac-even',
+    selectedClass  : 'ac-selected',            // 选中条目ClassName
+    buildList: function(){
+        return '&lt;ul&gt;&lt;/ul&gt;';
+    },
+    buildItem: function(item){
+        return '&lt;li&gt;&lt;a href="javascript:;"&gt;' + item +'&lt;/a&gt;&lt;/li&gt;';
+    },
+    buildEmptyTemplate: function(){
+        return '&lt;li class="ac-empty"&gt;没有数据.&lt;/li&gt;';
+    },
+    formatData: function(data){
+        return data;
+    },
+    formatSelectedData: function(origialData){
+        return origialData;
+    },
+    created: emptyFn,  // 控件创建后触发
+    selected: emptyFn  // 选择后触发
+})
+            </pre>
+        </div>
+    </body>
+    <script src="../package/autocompleteExample.package.js"></script>
+</html>
