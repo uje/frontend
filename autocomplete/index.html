@@ -30,6 +30,8 @@
             <pre>
 new AutoComplete({
     el             : '#keyword'                // 文本框（这里使用document.querySelector获取）
+    data           : [],                       // 数组 or Url, 为 url时可使用formatData格式化返回的数据，
+                                                  为数组时可使用 filter方法过滤
     interval       : 500,                      // 触发ajax间隔
     containerClass : 'ac-container',           // 外层容器className
     inputClass     : 'ac-input',               // 输入框className
@@ -39,23 +41,26 @@ new AutoComplete({
     oddClass       : 'ac-odd',
     evenClass      : 'ac-even',
     selectedClass  : 'ac-selected',            // 选中条目ClassName
-    buildList: function(){
+    buildList: function(){                     // 列表容器html模板
         return '&lt;ul&gt;&lt;/ul&gt;';
     },
-    buildItem: function(item){
+    buildItem: function(item){                 // 列表条目html模板 
         return '&lt;li&gt;&lt;a href="javascript:;"&gt;' + item +'&lt;/a&gt;&lt;/li&gt;';
     },
-    buildEmptyTemplate: function(){
+    buildEmptyTemplate: function(){            // 没有数据时显示的html
         return '&lt;li class="ac-empty"&gt;没有数据.&lt;/li&gt;';
     },
-    formatData: function(data){
+    formatData: function(data){                // 当data为url时，此方法起作用
         return data;
     },
     formatSelectedData: function(origialData){
         return origialData;
     },
-    created: emptyFn,  // 控件创建后触发
-    selected: emptyFn  // 选择后触发
+    filter: function(data, value){             // 当data为数组时，此方法会有input内容更改后调用
+        return data;
+    },
+    created: emptyFn,                          // 控件创建后触发
+    selected: emptyFn                          // 选择后触发
 })
             </pre>
         </div>
