@@ -1,3 +1,5 @@
+var emptyFn = function(){};
+
 function ajax(options) {
 
     options = options || {};

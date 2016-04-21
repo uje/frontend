@@ -73,7 +73,7 @@ AutoComplete.prototype = {
 		var instance = this,
 			options  = this.options,
 			value    = input.value,
-			url      = options.url.replace('{0}', value);
+			url ;
 
 		if(this.timerID) 
 			clearTimeout(this.timerID);
@@ -84,6 +84,15 @@ AutoComplete.prototype = {
 			return;
 		}
 
+		// 如果是本地数据直接用函数过滤
+		if(utils.isArray(options.data)){
+			var filterData = options.filter(options.data, value);
+			this.render(filterData);
+			return;
+		}
+
+		url = options.data.replace('{0}', value);
+
 		// 使用定时器来减少服务器压力
 		this.timerID = setTimeout(function(){
 			ajax({
@@ -91,22 +100,12 @@ AutoComplete.prototype = {
 				url: url,
 				done: function(text){
 					try{
-						var data = instance.data = options.formatData(JSON.parse(text)),
-							listItemsHtml = data.map(function(item){
-								return options.buildItem(item);
-							}).join('');
-
-						instance.list.innerHTML = listItemsHtml;
-
-						slice.call(instance.list.childNodes).forEach(function(item, i){
-							item.className = [options.itemClass, (i % 2 === 0 ? options.oddClass : options.evenClass)].join(' ');
-							item.setAttribute('data-index', i);
-						});
+						var data = instance.data = options.formatData(JSON.parse(text));
+						instance.render(data);
 					}catch(e){
 						instance.list.innerHTML = instance.emptyTemplate;
+						instance.listContainer.style.display = 'block';
 					}
-
-					instance.listContainer.style.display = 'block';
 				},
 				fail: function(){
 					instance.list.innerHTML = instance.emptyTemplate;
@@ -119,15 +118,18 @@ AutoComplete.prototype = {
 		var options = this.options,
 			selectedItem = event.target.classList.contains(options.itemClass) ? event.target : event.target.parentNode;
 		
+		// 找到 有item标识的节点
 		if(!selectedItem.classList.contains(options.itemClass))
 			event.stopPropagation();
 
+		// 找到数据并转换数据
 		var selectedData = this.data[selectedItem.getAttribute('data-index')],
 			inputValue = options.formatSelectedData(selectedData); // 格式化选中的值
 
 		this.input.value = inputValue;
 		this.list.style.visibility = 'hidden';
 
+		// 去除之前选中节点的选中class，给现在选中的节点加class
 		slice.call(this.list.childNodes).forEach(function(item){
 			item.classList.remove(options.selectedClass);
 		});
@@ -136,6 +138,28 @@ AutoComplete.prototype = {
 		selectedItem.classList.add(options.selectedClass);
 		this.trigger('selected', selectedData);
 
+	},
+	render: function(data){
+		var options = this.options,
+			list    = this.list;
+
+		if(data.length > 0){
+			var listItemsHtml = data.map(function(item){
+					return options.buildItem(item);
+				}).join('');
+
+			list.innerHTML = listItemsHtml;
+
+			// 给数据列表加标识，加样式
+			slice.call(list.childNodes).forEach(function(item, i){
+				item.className = [options.itemClass, (i % 2 === 0 ? options.oddClass : options.evenClass)].join(' ');
+				item.setAttribute('data-index', i);
+			});
+		}else{
+			list.innerHTML = this.emptyTemplate;
+		}
+
+		this.listContainer.style.display = 'block';
 	}
 }
 
@@ -166,6 +190,22 @@ AutoComplete.defaults = {
 	formatSelectedData: function(origialData){
 		return origialData;
 	},
+	filter: function(data, value){
+		var filterData = [],
+			i = 0,
+			l = data.length,
+			item;
+
+		for(; i<l; i++){
+			item = data[i];
+
+			if(new RegExp(value).test(item, 'gi'))
+				filterData.push(item);
+		}
+
+		return filterData;
+
+	},   // 过滤
 	created: emptyFn,  // 控件创建后触发
 	selected: emptyFn  // 选择后触发
 };
