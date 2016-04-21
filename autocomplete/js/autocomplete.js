@@ -38,7 +38,7 @@ AutoComplete.prototype = {
 
 		// 注册事件，有关键词有数据的时候显示控件
 		input.addEventListener('click', proxy(function(input, event){
-
+			
 			if(input.value.trim() != '' && this.data != null && this.data.length > 0){
 				this.listContainer.style.display = 'block';
 				event.stopPropagation();
@@ -61,6 +61,10 @@ AutoComplete.prototype = {
 		// 计算空内容模板
 		this.emptyTemplate = options.buildEmptyTemplate();
 		container.style.display = 'inline-block';
+
+		// 如果是传入的数据是数组，复制到数据源
+		if(utils.isArray(options.data))
+			this.data = options.data;
 
 		document.addEventListener('click', function(){
 			listContainer.style.display = 'none';
@@ -86,7 +90,7 @@ AutoComplete.prototype = {
 
 		// 如果是本地数据直接用函数过滤
 		if(utils.isArray(options.data)){
-			var filterData = options.filter(options.data, value);
+			var filterData = this.filterData = options.filter(this.data, value);
 			this.render(filterData);
 			return;
 		}
@@ -123,7 +127,7 @@ AutoComplete.prototype = {
 			event.stopPropagation();
 
 		// 找到数据并转换数据
-		var selectedData = this.data[selectedItem.getAttribute('data-index')],
+		var selectedData = (this.filterData || this.data)[selectedItem.getAttribute('data-index')],
 			inputValue = options.formatSelectedData(selectedData); // 格式化选中的值
 
 		this.input.value = inputValue;
