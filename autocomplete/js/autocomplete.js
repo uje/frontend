@@ -42,7 +42,7 @@ AutoComplete.prototype = {
 
 			if(input.value.trim() != '' && this.data != null && this.data.length > 0){
 				this.listContainer.style.display = 'block';
-				input.keyup();
+				this.keyupHandler(input);
 				event.stopPropagation();
 			}
 		}, this), false);
@@ -226,8 +226,12 @@ AutoComplete.prototype = {
 			options = this.options;
 
 		this.items.forEach(function(item, index){
-			if(index === instance.focusIndex)
+			if(index === instance.focusIndex){
 				item.classList.add(options.focusClass);
+
+				if(instance.listContainer.scrollTop + instance.listContainer.offsetHeight - item.offsetHeight < item.offsetTop)
+					instance.listContainer.scrollTop = item.offsetTop;
+			}
 			else
 				item.classList.remove(options.focusClass);
 		})
