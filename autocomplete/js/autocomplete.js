@@ -99,7 +99,7 @@ AutoComplete.prototype = {
 						instance.list.innerHTML = listItemsHtml;
 
 						slice.call(instance.list.childNodes).forEach(function(item, i){
-							item.className = [options.itemClass, (i % 2 === 0 && i != 0 ? options.oddClass : options.evenClass)].join(' ');
+							item.className = [options.itemClass, (i % 2 === 0 ? options.oddClass : options.evenClass)].join(' ');
 							item.setAttribute('data-index', i);
 						});
 					}catch(e){
