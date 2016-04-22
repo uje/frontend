@@ -37,12 +37,33 @@ function serialize(parameters) {
     return parms.join('&');
 }
 
-['get', 'post', 'put', 'delete'].forEach(function (method) {
-    ajax[method] = function (options) {
-        options = options || {};
-        options.type = method;
-        return ajax(options);
-    };
-});
+ajax.get = function(url, done, fail){
+    var options = {};
+
+    if(typeof url === 'object')
+        options = url;
+    else
+        options.url = url;
+
+    options.method = 'get';
+    options.done = done;
+    options.fail = fail;
+    return ajax(options);
+};
+
+ajax.post = function(url, data, done, fail){
+    var options = {};
+
+    if(typeof url ==='object')
+        options = url;
+    else
+        options.url = url;
+    
+    options.method = 'post';
+    options.data = data;
+    options.done = done;
+    options.fail = fail;
+    return ajax(options);
+};
 
 module.exports = ajax;

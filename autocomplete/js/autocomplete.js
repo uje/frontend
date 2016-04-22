@@ -58,12 +58,22 @@ AutoComplete.prototype = {
 					if(this.focusIndex > 0){
 						this.focusIndex--;
 						this.itemFocus();
+						var item = this.items[this.focusIndex];
+
+						// 如果当前选中项不要视野范围则移动到视野范围
+						if(instance.listContainer.scrollTop > item.offsetTop)
+							instance.listContainer.scrollTop = item.offsetTop - instance.listContainer.offsetHeight + item.offsetHeight;
 					}
 				break;
 				case 40:
 					if(this.focusIndex < this.items.length - 1){
 						this.focusIndex++;
 						this.itemFocus();
+						var item = this.items[this.focusIndex];
+
+						// 如果当前选中项不要视野范围则移动到视野范围
+						if(instance.listContainer.scrollTop + instance.listContainer.offsetHeight - item.offsetHeight < item.offsetTop)
+							instance.listContainer.scrollTop = item.offsetTop;
 					}
 				break;
 				case 13:
@@ -228,9 +238,6 @@ AutoComplete.prototype = {
 		this.items.forEach(function(item, index){
 			if(index === instance.focusIndex){
 				item.classList.add(options.focusClass);
-
-				if(instance.listContainer.scrollTop + instance.listContainer.offsetHeight - item.offsetHeight < item.offsetTop)
-					instance.listContainer.scrollTop = item.offsetTop;
 			}
 			else
 				item.classList.remove(options.focusClass);
