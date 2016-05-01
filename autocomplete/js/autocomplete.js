@@ -305,7 +305,7 @@ AutoComplete.defaults = {
 		for(; i<l; i++){
 			item = data[i];
 
-			if(new RegExp(value).test(item, 'gi'))
+			if(new RegExp(value, 'gi').test(item))
 				filterData.push(item);
 		}
 
