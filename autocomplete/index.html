@@ -24,14 +24,17 @@
             @media screen and (max-width: 480px){
                 .wrapper { padding: 20px 10px 0; }
                 .code { max-width: 100%; overflow-x:  auto; -webkit-overflow-scrolling: touch; }
-                .ac-list-container { top: 80px; left: 10px; right: 10px; bottom: 0; max-height: 600px; -webkit-overflow-scrolling: touch; }
-                .ac-focus { position: absolute; top: 0 ; left: 0; right: 0; bottom: 0; background-color: #fff; }
-                .ac-focus .ac-input { margin: 20px 0 0 10px; }
+                .ac-focus { z-index: 100; position: fixed; top: 0 ; left: 0; right: 0; bottom: 0; background-color: #fff; }
+                .ac-list-container { top: 80px; left: 10px; right: 10px; bottom: 0; -webkit-overflow-scrolling: touch; }
+                .ac-close { display: none; position: fixed; right: 10px; top: 10px; padding: 0; border: none; background: none; font-size: 30px; color: #888; }
+                .ac-focus .ac-input { width: 250px; margin: 20px 0 0 10px; border-width: 1px; }
+                .ac-focus .ac-close { display: block; }
             }
 
             @media screen and (min-width: 481px){
-                .ac-list-container { width: 300px; max-height: 300px; margin-top: 10px; border: 1px solid #eee; border-radius: 0 0 5px 5px; box-shadow: 3px 3px 3px #ccc; }
-            } 
+                .ac-list-container { max-height: 300px; margin-top: 10px; border: 1px solid #eee; border-radius: 0 0 5px 5px; box-shadow: 3px 3px 3px #ccc; }
+                .ac-input { width: 290px; }
+            }
         </style>
     </head>
     <body>

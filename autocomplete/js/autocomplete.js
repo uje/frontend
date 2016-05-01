@@ -4,7 +4,8 @@ var ajax    = require('./ajax'),
 	Event   = require('./Event'),
 	utils   = require('./utils'),
 	emptyFn = function(){},
-	slice = Array.prototype.slice;
+	slice = Array.prototype.slice,
+	isTouch = 'ontouchstart' in document;
 
 
 function proxy(fun, thisTraget){
@@ -34,7 +35,8 @@ AutoComplete.prototype = {
 		container.className = options.containerClass;
 		input.parentNode.replaceChild(container, input);
 		input.classList.add(options.inputClass);
-		input.addEventListener('keyup', proxy(this.keyupHandler, this), false);
+		input.addEventListener('change', proxy(this.keyupHandler, this), false);
+		input.addEventListener('input', proxy(this.keyupHandler, this), false);
 
 		// 注册事件，有关键词有数据的时候显示控件
 		input.addEventListener('click', proxy(function(input, event){
@@ -90,9 +92,21 @@ AutoComplete.prototype = {
 			container.classList.add(options.focusClass);
 		}, false);
 
-		input.addEventListener('blur', function(){
-			container.classList.remove(options.focusClass);
-		},false);
+		if(!isTouch){
+			input.addEventListener('blur', function(){
+				container.classList.remove(options.focusClass);
+			}, false);
+		}else{
+			var close = document.createElement('button');
+			close.type = 'button';
+			close.classList.add(options.closeClass);
+			close.innerHTML = '×';
+			close.addEventListener('click', function(){
+				container.classList.remove(options.focusClass);
+			}, false);
+
+			container.appendChild(close);
+		}
 
 		container.appendChild(input);
 
@@ -124,43 +138,42 @@ AutoComplete.prototype = {
 	},
 	keyupHandler: function(input, event){
 		var instance = this,
-			options  = this.options,
-			value    = input.value.trim(), url ;
+			options  = instance.options;
 
-		if(this.timerID) 
-			clearTimeout(this.timerID);
+		if(instance.keyupTimeID)
+			clearTimeout(instance.keyupTimeID);
 
-		// 如果没有关键词，隐藏结果
-		if(value.trim() === ''){
-			this.listContainer.style.display = 'none';
-			return;
-		}
+		instance.keyupTimeID = setTimeout(function(){
+			var value    = input.value.trim(), url;
 
-		// 清掉回车过来的状态
-		if(this.fromEnter){
-			this.fromEnter = false;
-			return;
-		}
+			// 如果没有关键词，隐藏结果
+			if(value.trim() === ''){
+				instance.listContainer.style.display = 'none';
+				return;
+			}
 
-		// 当前值跟上次一样
-		if(this.lastValue === value)
-			return;
+			// 清掉回车过来的状态
+			if(instance.fromEnter){
+				instance.fromEnter = false;
+				return;
+			}
 
-		// 保存当前值，防止同样的值重新搜索
-		this.lastValue = value;
+			// 当前值跟上次一样
+			if(instance.lastValue === value)
+				return;
 
-		// 如果是本地数据直接用函数过滤
-		if(utils.isArray(options.data)){
-			var filterData = this.filterData = options.filter(this.data, value);
-			this.render(filterData);
-			return;
-		}
+			// 保存当前值，防止同样的值重新搜索
+			instance.lastValue = value;
 
-		
-		url = options.data.replace('{0}', value);
+			// 如果是本地数据直接用函数过滤
+			if(utils.isArray(options.data)){
+				var filterData = instance.filterData = options.filter(instance.data, value);
+				instance.render(filterData);
+				return;
+			}
+			
+			url = options.data.replace('{0}', value);
 
-		// 使用定时器来减少服务器压力
-		this.timerID = setTimeout(function(){
 			ajax({
 				type: 'get',
 				url: url,
@@ -177,7 +190,7 @@ AutoComplete.prototype = {
 					instance.list.innerHTML = instance.emptyTemplate;
 				}
 			});
-		}, options.interval);
+		}, instance.interval);
 
 	},
 	itemClickHandler: function(list, event){
@@ -204,8 +217,11 @@ AutoComplete.prototype = {
 		});
 
 		this.list.style.visibility = 'visible';
+
+		// 移动端失效
 		this.input.focus();
 		selectedItem.classList.add(options.selectedClass);
+		this.fromEnter = false;
 		this.trigger('selected', selectedData);
 
 	},
@@ -256,6 +272,7 @@ AutoComplete.defaults = {
 	interval       : 500,
 	containerClass : 'ac-container',
 	inputClass     : 'ac-input',
+	closeClass     : 'ac-close',
 	listContainerClass: 'ac-list-container',
 	listClass      : 'ac-list',
 	itemClass      : 'ac-item',
