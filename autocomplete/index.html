@@ -12,7 +12,7 @@
 
             .wrapper { max-width: 600px; margin: 0 auto; padding-top: 120px; }
             .ac-container { position: relative; display: inline-block; }
-            .ac-list-container { display: none; z-index: 10; position: absolute; }
+            .ac-list-container { display: none; z-index: 10; position: absolute; background-color: #fff; overflow-y: auto; }
             .ac-input { display: block; width: 290px; padding: 0 5px; border: 3px solid #ddd; border-radius: 5px; line-height: 36px; }
             .ac-item a { display: block; padding: 0 40px 0 10px; line-height: 36px; text-align: left; }
             .ac-item a:hover, .ac-selected { background-color: #ddd; }
@@ -24,13 +24,13 @@
             @media screen and (max-width: 480px){
                 .wrapper { padding: 20px 10px 0; }
                 .code { max-width: 100%; overflow-x:  auto; -webkit-overflow-scrolling: touch; }
-                .ac-list-container { top: 90px; left: 10px; right: 10px; bottom: 0; max-height: 300px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+                .ac-list-container { top: 120px; left: 10px; right: 10px; bottom: 0; max-height: 300px; -webkit-overflow-scrolling: touch; }
                 .ac-focus { position: absolute; top: 0 ; left: 0; right: 0; bottom: 0; background-color: #fff; }
                 .ac-focus .ac-input { margin: 60px 0 0 10px; }
             }
 
             @media screen and (min-width: 481px){
-                .ac-list-container { width: 300px; max-height: 300px; overflow-y: auto; margin-top: 10px; background-color: #fff; border: 1px solid #eee; border-radius: 0 0 5px 5px; box-shadow: 3px 3px 3px #ccc; }
+                .ac-list-container { width: 300px; max-height: 300px; margin-top: 10px; border: 1px solid #eee; border-radius: 0 0 5px 5px; box-shadow: 3px 3px 3px #ccc; }
             }
         </style>
     </head>
