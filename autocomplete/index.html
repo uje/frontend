@@ -2,23 +2,36 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" />
         <title>AutoComplete示例</title>
         <style>
-            html, body, div, h1, ul, li, input, textarea,strong { margin: 0; padding: 0; box-sizing: content-box; }
+            html, body, div, h1, ul, li, input, textarea,strong { margin: 0; padding: 0; box-sizing: border-box; }
             a, a:link, a:visited, a:hover, a:active { text-decoration: none; color: #3675b4; }
             li { list-style-type: none; }
             .page-title { margin-bottom: 30px; font-size: 26px; }
 
             .wrapper { max-width: 600px; margin: 0 auto; padding-top: 120px; }
-            .ac-container {position: relative; display: inline-block; }
+            .ac-container { position: relative; display: inline-block; }
+            .ac-list-container { display: none; z-index: 10; position: absolute; }
             .ac-input { display: block; width: 290px; padding: 0 5px; border: 3px solid #ddd; border-radius: 5px; line-height: 36px; }
-            .ac-list-container { z-index: 10; display: none; position: absolute; width: 300px; max-height: 300px; overflow-y: auto; margin-top: 10px; background-color: #fff; border: 1px solid #eee; border-radius: 0 0 5px 5px; box-shadow: 3px 3px 3px #ccc; }
             .ac-item a { display: block; padding: 0 40px 0 10px; line-height: 36px; text-align: left; }
             .ac-item a:hover, .ac-selected { background-color: #ddd; }
-            .ac-focus { background-color: #eee; }
+            .ac-item-focus { background-color: #eee; }
             .ac-empty { padding: 30px 0; text-align: center; color: #ccc; }
 
             .sub-title { display: block; margin-top: 30px; font-size: 20px; }
+
+            @media screen and (max-width: 480px){
+                .wrapper { padding: 20px 10px 0; }
+                .code { max-width: 100%; overflow-x:  auto; -webkit-overflow-scrolling: touch; }
+                .ac-list-container { top: 90px; left: 10px; right: 10px; bottom: 0; max-height: 300px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+                .ac-focus { position: absolute; top: 0 ; left: 0; right: 0; bottom: 0; background-color: #fff; }
+                .ac-focus .ac-input { margin: 60px 0 0 10px; }
+            }
+
+            @media screen and (min-width: 481px){
+                .ac-list-container { width: 300px; max-height: 300px; overflow-y: auto; margin-top: 10px; background-color: #fff; border: 1px solid #eee; border-radius: 0 0 5px 5px; box-shadow: 3px 3px 3px #ccc; }
+            }
         </style>
     </head>
     <body>
@@ -27,7 +40,7 @@
             <input type="text" id="keyword" placeholder="输入明星姓名查找">
 
             <strong class="sub-title">调用方式</strong>
-            <pre>
+            <pre class="code">
 new AutoComplete({
     el             : '#keyword'                // 文本框（这里使用document.querySelector获取）
     data           : [],                       // 数组 or Url, 为 url时可使用formatData格式化返回的数据，

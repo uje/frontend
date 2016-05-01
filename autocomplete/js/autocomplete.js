@@ -11,8 +11,7 @@ function proxy(fun, thisTraget){
 	return function(){
 
 		// 将原this作为第一个参数
-		var args = [this].concat(slice.call(arguments));
-		fun.apply(thisTraget, args);
+		fun.apply(thisTraget, [this].concat(slice.call(arguments)));
 	};
 }
 
@@ -78,7 +77,7 @@ AutoComplete.prototype = {
 				break;
 				case 13:
 					this.items.forEach(function(item){
-						if(item.classList.contains(options.focusClass)){
+						if(item.classList.contains(options.itemFocusClass)){
 							instance.fromEnter = true;
 							item.click();
 						}
@@ -87,12 +86,19 @@ AutoComplete.prototype = {
 			}
 		}, this), false);
 
+		input.addEventListener('focus', function(){
+			container.classList.add(options.focusClass);
+		}, false);
+
+		input.addEventListener('blur', function(){
+			container.classList.remove(options.focusClass);
+		},false);
+
 		container.appendChild(input);
 
 		// 创建列表
 		var listHtml = options.buildList(),
-			listContainer = this.listContainer = document.createElement('div'),
-			list;
+			listContainer = this.listContainer = document.createElement('div'), list;
 
 		listContainer.innerHTML = listHtml;
 		listContainer.className = options.listContainerClass;
@@ -119,8 +125,7 @@ AutoComplete.prototype = {
 	keyupHandler: function(input, event){
 		var instance = this,
 			options  = this.options,
-			value    = input.value.trim(),
-			url ;
+			value    = input.value.trim(), url ;
 
 		if(this.timerID) 
 			clearTimeout(this.timerID);
@@ -237,10 +242,10 @@ AutoComplete.prototype = {
 
 		this.items.forEach(function(item, index){
 			if(index === instance.focusIndex){
-				item.classList.add(options.focusClass);
+				item.classList.add(options.itemFocusClass);
 			}
 			else
-				item.classList.remove(options.focusClass);
+				item.classList.remove(options.itemFocusClass);
 		})
 	}
 }
@@ -258,6 +263,7 @@ AutoComplete.defaults = {
 	evenClass      : 'ac-even',
 	selectedClass  : 'ac-selected',
 	focusClass     : 'ac-focus',
+	itemFocusClass : 'ac-item-focus',
 	buildList: function(){
 		return '<ul></ul>';
 	},
