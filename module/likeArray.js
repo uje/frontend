@@ -306,15 +306,6 @@
 			return '[Object Array]';
 		}
 	});
-	
-	// 增加对for..in支持
-	if(window.Symbol && window.Symbol.iterator){
-		LikeArray.prototype[Symbol.iterator]= function*(){
-			for(var i=0; i<this.length; i++){
-				yield i;
-			}
-		};
-	}
 
 	// 在ES6环境下支持　delete instance[0]及 instance[0] = 'hello'
 	if(window.Proxy){
