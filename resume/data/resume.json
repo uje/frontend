@@ -33,30 +33,30 @@
 	],
 	"projects": [
 		{
-			"name"      : "51job校招官微（微信号：51job校园招聘）",
-			"company"   : "前程无忧",
+			"name"      : "XXX",
+			"company"   : "XXX",
 			"job"       : "技术负责人",
 			"beginDate" : "2014-12-16",
 			"detail"    : "这是一个面向广大在校学生的内容资讯平台，为学生提供宣讲会、笔面试、实习等信息。项目分为微信服务层、管理后台、用户服务三部分。后端采用MVC三层架构，采用的技术有.NET MVC4、EntityFramework。前端以模块化方式，使用seajs进行模块管理，结合路由、js模板及boostrap进行开发。后端与前端的数据交互采用RESTful架构。"
 		},
 		{
-			"name"      : "工作助手",
-			"company"   : "前程无忧",
+			"name"      : "XXX",
+			"company"   : "XXX",
 			"job"       : "项目前端负责人",
 			"beginDate" : "2014-07-21",
 			"detail"    : "此APP（工作助手）主要是为外勤业务人员提供信息查询与录入的服务，技术上，采用混合（hybird）模式开发。前端工程以模块化方式，使用AppFramework为主框架，通过doT进行模板编译，seajs进行模块加载。GruntJS压缩合并资源来优化性能，最后结合PhoneGap打包成App。"
 		},
 		{
-			"name"      : "汽车大数据智能分析平台",
-			"company"   : "广州威尔森企业管理咨询有限公司",
+			"name"      : "XXX",
+			"company"   : "XXX",
 			"job"       : "前端工程环境搭建、组件开发",
 			"beginDate" : "2013-06-26",
 			"endDate"   : "2014-07-19",
 			"detail"    : "汽车大数据智能分析平台是威尔森公司推出的一套在线数据整合分析和决策应用的商业智能平台。技术上，采用前后端分离的开发模式，前端资源独立部署。使用 GruntJS 实现前端资源工程化，NodeJS架设静态服务器进行模拟数据，CoffeeScript、LessCss进行前端编码，模块化推进前端开发。"
 		},
 		{
-			"name"      : "我去过社区",
-			"company"   : "广州一起飞商旅信息服务有限公司",
+			"name"      : "XXX",
+			"company"   : "XXX",
 			"job"       : "后端编码、微博接入技术实现、js功能开发、页面兼容性处理",
 			"beginDate" : "2011-07-06",
 			"endDate"   : "2013-06-19",
@@ -65,7 +65,7 @@
 	],
 	"educations": [
 		{
-			"school"    : "广州大学",
+			"school"    : "XXX",
 			"beginDate" : "2013-01",
 			"endDate"   : "2016-01",
 			"major"     : "计算机网络技术",
