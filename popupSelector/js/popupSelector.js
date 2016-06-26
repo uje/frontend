@@ -51,35 +51,42 @@
         },
         start: function(e){
             var $container = this.$container,
-                offset = $container.offset();
+                offset = $container.offset(),
+                $doc = $(document);
 
             this.startArgs = {
-                width: $container.width(),
-                height : $container.height(),
                 left: offset.left, 
                 top: offset.top,
                 x: e.clientX,
-                y: e.clientY
+                y: e.clientY,
+                maxLeft: $doc.width() - $container.width(),
+                maxTop: $doc.height() - $container.height()
             };
 
             this.dragable = true;
         },
         move: function(e){
-            var startArgs = this.startArgs,
+            var $doc =　$(document),
+                startArgs = this.startArgs,
                 offsetX = e.clientX - startArgs.x,
                 offsetY = e.clientY - startArgs.y,
                 newLeft = startArgs.left + offsetX,
-                newTop = startArgs.top + offsetY,
-                fullWidth = newLeft + startArgs.width,
-                fullHeight = newTop + startArgs.height,
-                $doc =　$(document);
+                newTop = startArgs.top + offsetY;
 
-            if(newLeft + startArgs.width <= $doc.width() && newLeft >= 0)
-                this.$container.css('left', newLeft);
+            if(newLeft < 0)
+                newLeft = 0;
 
-            if(newTop + startArgs.height <= $doc.height() && newTop >= 0)
-                this.$container.css('top', newTop);
+            if(newTop < 0)
+                newTop = 0;
 
+            if(newLeft > startArgs.maxLeft)
+                newLeft = startArgs.maxLeft;
+
+            if(newTop > startArgs.maxTop)
+                newTop = startArgs.maxTop;
+
+            this.$container.css('left', newLeft);
+            this.$container.css('top', newTop);
         },
         destory: function(){
             var me = this;
